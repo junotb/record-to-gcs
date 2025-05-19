@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 
 export function useRecorder() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const frameIdRef = useRef<number | null>(null);
 
@@ -65,6 +65,15 @@ export function useRecorder() {
   const stopRecording = () => {
     mediaRecorderRef.current?.stop();
     setIsRecording(false);
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    const stream = video?.srcObject as MediaStream | null;
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      video.srcObject = null;
+    }
   };
 
   return {
