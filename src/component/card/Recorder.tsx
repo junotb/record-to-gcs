@@ -54,6 +54,7 @@ export function Recorder() {
             <Link
               href={recordedUrl ? recordedUrl : "#"}
               target="_blank"
+              rel="noopener noreferrer"
               download="recording.webm"
               className="inline-block px-4 py-2 bg-blue-600 text-white rounded-xl shadow-xl"
             >
