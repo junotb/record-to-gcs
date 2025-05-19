@@ -69,7 +69,7 @@ export function useRecorder() {
     const video = videoRef.current;
     if (!video) return;
 
-    const stream = video?.srcObject as MediaStream | null;
+    const stream = video.srcObject as MediaStream | null;
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
       video.srcObject = null;

@@ -16,7 +16,7 @@ export function Recorder({ videoRef, canvasRef, isRecording, startRecording, sto
       <div className="flex justify-center items-center w-80 h-80 sm:w-96 sm:h-96 bg-gray-100 rounded-xl shadow-xl">
         <canvas
           ref={canvasRef}
-          className="w-full aspect-auto rounded-xl" />
+          className="w-full aspect-video rounded-xl" />
         <video ref={videoRef} muted playsInline className="hidden" />
       </div>
 
