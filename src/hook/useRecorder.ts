@@ -20,6 +20,14 @@ export function useRecorder() {
     video.srcObject = stream;
     await video.play();
 
+    const { videoWidth, videoHeight } = video;
+
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+
+    canvas.style.width = "100%";
+    canvas.style.height = `${videoHeight / videoWidth * 100}%`;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
