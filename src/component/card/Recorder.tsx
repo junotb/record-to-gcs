@@ -11,8 +11,8 @@ interface RecorderProps {
 export function Recorder({ videoRef, canvasRef, isRecording, startRecording, stopRecording }: RecorderProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-center items-center w-80 h-80 sm:w-96 sm:h-96 rounded-xl shadow-xl">
-        <div className="inline-block w-full rounded-xl shadow-xl">
+      <div className="flex justify-center items-center w-80 min-h-[20rem] sm:w-96 sm:min-h-[24rem] rounded-xl shadow-xl">
+        <div className="inline-block w-full">
           <canvas
             ref={canvasRef}
             className="block w-full aspect-auto rounded-xl" />
