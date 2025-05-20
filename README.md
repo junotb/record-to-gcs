@@ -1,4 +1,4 @@
-# Record To Gcs
+# Record To Webm
 
 캔버스를 기반으로 웹캠 스트림을 녹화하고 다운로드할 수 있는 React 컴포넌트입니다.
 
@@ -24,7 +24,9 @@
 canvas-recorder/
 ├── src/
 │   ├── component/
-│   │   └── Recorder.tsx        # 메인 컴포넌트
+│   │   └── Card
+│   │       └── Playback.tsx        # 재생 컴포넌트
+│   │       └── Recorder.tsx        # 녹화 컴포넌트
 │   └── hook/
 │       └── useRecorder.ts      # 녹화 및 스트림 로직
 ├── public/
