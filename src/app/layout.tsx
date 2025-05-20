@@ -8,8 +8,8 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "Record To Gcs",
-  description: "Easily record and upload audio files directly to Google Cloud Storage with Record To Gcs.",
+  title: "Record To Webm",
+  description: "Easily record screen or webcam in your browser and save as WebM.",
 };
 
 export default function RootLayout({
