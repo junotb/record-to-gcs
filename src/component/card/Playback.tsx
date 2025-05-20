@@ -10,7 +10,11 @@ export function Playback({ recordedUrl }: PlaybackProps) {
     <div className="flex flex-col gap-4">
       <div className="flex justify-center items-center w-80 min-h-80 sm:w-96 sm:min-h-96 rounded-xl shadow-xl">
         {recordedUrl ? (
-          <video src={recordedUrl} controls className="w-full aspect-auto rounded-xl" />
+          <video
+            src={recordedUrl}
+            controls
+            className="w-full aspect-auto rounded-xl"
+          />
         ) : (
           <Image
             src="/video-camera-slash.svg"

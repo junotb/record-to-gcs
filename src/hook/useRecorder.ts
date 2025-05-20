@@ -33,12 +33,11 @@ export function useRecorder() {
 
     const draw = () => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      frameIdRef.current = requestAnimationFrame(draw); // Store the frame ID
+      frameIdRef.current = requestAnimationFrame(draw);
     }
 
     draw();
 
-    // Cleanup function to cancel the animation frame
     return () => {
       if (frameIdRef.current !== null) {
         cancelAnimationFrame(frameIdRef.current);
