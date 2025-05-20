@@ -12,7 +12,9 @@ export function Playback({ recordedUrl }: PlaybackProps) {
         {recordedUrl ? (
           <video
             src={recordedUrl}
+            playsInline
             controls
+            preload="auto"
             className="w-full aspect-auto rounded-xl"
           />
         ) : (
