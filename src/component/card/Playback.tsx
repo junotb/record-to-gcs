@@ -8,7 +8,7 @@ interface PlaybackProps {
 export function Playback({ recordedUrl }: PlaybackProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-center items-center w-80 h-80 sm:w-96 sm:h-96 rounded-xl shadow-xl">
+      <div className="flex justify-center items-center w-80 min-h-80 sm:w-96 sm:min-h-96 rounded-xl shadow-xl">
         {recordedUrl ? (
           <video src={recordedUrl} controls className="w-full aspect-auto rounded-xl" />
         ) : (
