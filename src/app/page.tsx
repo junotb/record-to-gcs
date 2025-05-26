@@ -3,10 +3,11 @@
 import { Recorder } from "@/component/Recorder";
 import { Header } from "@/component/Header";
 import { Playback } from "@/component/Playback";
+import { Toast } from "@/component/Toast";
 import { useRecorder } from "@/hook/useRecorder";
 
 export default function Home() {
-  const { videoRef, canvasRef, isRecording, recordedUrl, startRecording, stopRecording } = useRecorder();
+  const { videoRef, canvasRef, isRecording, recordedUrl, error, startRecording, stopRecording } = useRecorder();
   
   return (
     <div className="flex flex-col items-center w-full h-full bg-white">
@@ -20,14 +21,20 @@ export default function Home() {
               canvasRef={canvasRef}
               isRecording={isRecording}
               startRecording={startRecording}
-              stopRecording={stopRecording} />
+              stopRecording={stopRecording}
+            />
           </div>
           <div className="flex flex-col gap-4 p-4">
             <h2 className="text-center text-xl font-bold">Playback</h2>
-            <Playback recordedUrl={recordedUrl} />
+            <Playback
+              recordedUrl={recordedUrl}
+            />
           </div>
         </div>
       </main>
+      <Toast
+        error={error}
+      />
     </div>
   );
 }
