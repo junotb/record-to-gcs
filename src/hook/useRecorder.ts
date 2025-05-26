@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 
 export function useRecorder() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const [isRecording, setIsRecording] = useState(false);
@@ -32,77 +31,39 @@ export function useRecorder() {
     }
   };
 
-  const initStream = async () => {
+  const startRecording = async () => {
+    // 이미 녹화 중이면 아무 작업도 하지 않음
+    if (isRecording) {
+      setError("이미 녹화 중입니다.");
+      return;
+    };
+
+    // 사파리 브라우저에서는 녹화 기능이 지원되지 않음
     if (isSafari()) {
       setError("Safari에서는 녹화 기능이 지원되지 않습니다. 다른 브라우저를 사용해주세요.");
       return;
     }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-
-      if (!video || !canvas) return;
-
-      video.srcObject = stream;
-      await video.play();
-
-      const { videoWidth, videoHeight } = video;
-
-      canvas.width = videoWidth;
-      canvas.height = videoHeight;
-
-      canvas.style.width = "100%";
-      canvas.style.height = `${videoHeight / videoWidth * 100}%`;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      const draw = () => {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        requestAnimationFrame(draw);
-      }
-
-      draw();
-    } catch (error) {
-      console.error(error);
-      setError("카메라 또는 마이크에 접근할 수 없습니다. 권한을 확인해주세요.");
-    }
-  };
-
-  // 녹화 시작
-  const startRecording = async () => {
-    // 이미 녹화 중이면 아무 작업도 하지 않음
-    if (isRecording) return;
-
-    // 권한 확인
+    // 미디어 권한 확인
     const permissionGranted = await hasMediaPermission();
     if (!permissionGranted) return;
 
-    // 스트림 초기화
-    await initStream();
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
     try {
-      const videoStream = canvas.captureStream();
-      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!videoStream || !audioStream) {
-        setError("비디오 또는 오디오 스트림을 가져올 수 없습니다.");
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+
+      if (!stream) {
+        setError("미디어 스트림을 가져올 수 없습니다.");
         return;
       }
 
-      // 비디오와 오디오 스트림을 결합
-      const combinedStream = new MediaStream([
-        ...videoStream.getVideoTracks(),
-        ...audioStream.getAudioTracks()
-      ]);
+      // 비디오 요소에 스트림 설정
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
       
       // 미디어 레코더 생성
-      const mediaRecorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
 
       const chunks: Blob[] = [];
 
@@ -123,8 +84,7 @@ export function useRecorder() {
         setRecordedUrl(url);
 
         // 비디오와 오디오 스트림을 정리
-        videoStream.getTracks().forEach((track) => track.stop());
-        audioStream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -149,11 +109,9 @@ export function useRecorder() {
 
   return {
     videoRef,
-    canvasRef,
     isRecording,
     recordedUrl,
     error,
-    initStream,
     startRecording,
     stopRecording,
   };

@@ -1,13 +1,13 @@
 "use client";
 
-import { Recorder } from "@/component/Recorder";
 import { Header } from "@/component/Header";
 import { Playback } from "@/component/Playback";
+import { Recorder } from "@/component/Recorder";
 import { Toast } from "@/component/Toast";
 import { useRecorder } from "@/hook/useRecorder";
 
 export default function Home() {
-  const { videoRef, canvasRef, isRecording, recordedUrl, error, startRecording, stopRecording } = useRecorder();
+  const { videoRef, isRecording, recordedUrl, error, startRecording, stopRecording } = useRecorder();
   
   return (
     <div className="flex flex-col items-center w-full h-full bg-white">
@@ -18,7 +18,6 @@ export default function Home() {
             <h2 className="text-center text-xl font-bold">Record</h2>
             <Recorder
               videoRef={videoRef}
-              canvasRef={canvasRef}
               isRecording={isRecording}
               startRecording={startRecording}
               stopRecording={stopRecording}
