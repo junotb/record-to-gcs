@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
 import { Recorder } from "@/component/card/Recorder";
 import { Header } from "@/component/Header";
 import { Playback } from "@/component/card/Playback";
 import { useRecorder } from "@/hook/useRecorder";
 
 export default function Home() {
-  const { videoRef, canvasRef, isInitialized, isRecording, recordedUrl, initStream, startRecording, stopRecording } = useRecorder();
-
-  useEffect(() => {
-    initStream();
-  }, [initStream]);
+  const { videoRef, canvasRef, isRecording, recordedUrl, startRecording, stopRecording } = useRecorder();
   
   return (
     <div className="flex flex-col items-center w-full h-full bg-white">
@@ -23,7 +18,6 @@ export default function Home() {
             <Recorder
               videoRef={videoRef}
               canvasRef={canvasRef}
-              isInitialized={isInitialized}
               isRecording={isRecording}
               startRecording={startRecording}
               stopRecording={stopRecording} />
