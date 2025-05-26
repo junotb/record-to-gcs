@@ -51,6 +51,9 @@ export function useRecorder() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // MediaRecorder의 MIME 타입 설정
+    const isWebmSupported = MediaRecorder.isTypeSupported("video/webm");
+
     try {
       const videoStream = canvas.captureStream();
       const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -61,9 +64,7 @@ export function useRecorder() {
         ...audioStream.getAudioTracks()
       ]);
       
-      const mediaRecorder = new MediaRecorder(combinedStream, {
-        mimeType: "video/webm"
-      });
+      const mediaRecorder = new MediaRecorder(combinedStream, isWebmSupported ? { mimeType: "video/webm" } : undefined);
 
       const chunks: Blob[] = [];
 
@@ -72,7 +73,7 @@ export function useRecorder() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/webm" });
+        const blob = new Blob(chunks, isWebmSupported ? { type: "video/webm" } : undefined);
         const url = URL.createObjectURL(blob);
 
         // 이전 녹화 URL이 있다면 해제
