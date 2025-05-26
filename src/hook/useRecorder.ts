@@ -47,41 +47,61 @@ export function useRecorder() {
     };
   };
 
-  const startRecording = () => {
+  // 녹화 시작
+  const startRecording = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const stream = canvas.captureStream();
-    const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-    const chunks: Blob[] = [];
+    try {
+      const videoStream = canvas.captureStream();
+      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) chunks.push(event.data);
-    };
+      // 비디오와 오디오 스트림을 결합
+      const combinedStream = new MediaStream([
+        ...videoStream.getVideoTracks(),
+        ...audioStream.getAudioTracks()
+      ]);
+      
+      const mediaRecorder = new MediaRecorder(combinedStream, {
+        mimeType: "video/webm"
+      });
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "video/webm" });
-      const url = URL.createObjectURL(blob);
-      setRecordedUrl(url);
-    };
+      const chunks: Blob[] = [];
 
-    mediaRecorder.start();
-    mediaRecorderRef.current = mediaRecorder;
-    setIsRecording(true);
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+
+        // 이전 녹화 URL이 있다면 해제
+        if (recordedUrl) {
+          URL.revokeObjectURL(recordedUrl);
+        }
+
+        setRecordedUrl(url);
+
+        // 비디오와 오디오 스트림을 정리
+        videoStream.getTracks().forEach((track) => track.stop());
+        audioStream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorder.start();
+      mediaRecorderRef.current = mediaRecorder;
+      setIsRecording(true);
+    } catch (error) {
+      console.error("오디오 장치에 접근할 수 없습니다. 오디오 권한을 확인해주세요: ", error);
+    }
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
+    const mediaRecorder = mediaRecorderRef.current;
+    if (!mediaRecorder) return;
+
+    mediaRecorder.stop();
     setIsRecording(false);
-
-    const video = videoRef.current;
-    if (!video) return;
-
-    const stream = video.srcObject as MediaStream | null;
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      video.srcObject = null;
-    }
   };
 
   return {
