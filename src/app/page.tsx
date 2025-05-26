@@ -1,8 +1,8 @@
 "use client";
 
-import { Recorder } from "@/component/card/Recorder";
+import { Recorder } from "@/component/Recorder";
 import { Header } from "@/component/Header";
-import { Playback } from "@/component/card/Playback";
+import { Playback } from "@/component/Playback";
 import { useRecorder } from "@/hook/useRecorder";
 
 export default function Home() {
