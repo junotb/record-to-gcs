@@ -20,21 +20,24 @@ export function Recorder({ videoRef, canvasRef, isRecording, startRecording, sto
         </div>
       </div>
 
-      {!isRecording ? (
-        <button
-          onClick={startRecording}
-          className="px-4 py-2 border bg-black text-white rounded-xl shadow-xl"
-        >
-          녹화 시작
-        </button>
-      ) : (
-        <button
-          onClick={stopRecording}
-          className="px-4 py-2 border bg-white text-black rounded-xl shadow-xl"
-        >
-          녹화 중지
-        </button>
-      )}
+      <div className="w-full h-12">
+        {isRecording && (
+          <button
+            onClick={stopRecording}
+            className="border px-4 py-2 w-full bg-white text-black rounded-xl shadow-xl"
+          >
+            녹화 중지
+          </button>
+        )}
+        {!isRecording && (
+          <button
+            onClick={startRecording}
+            className="border px-4 py-2 w-full bg-black text-white rounded-xl shadow-xl"
+          >
+            녹화 시작
+          </button>
+        )}
+      </div>
     </div>
   );
 }

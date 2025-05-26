@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, useState } from "react";
 
 export function useRecorder() {
@@ -8,6 +10,24 @@ export function useRecorder() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+
+  // 마이크와 카메라 권한 확인
+  const hasMediaPermission = async (): Promise<boolean> => {
+    try {
+      const microphone = await navigator.permissions.query({ name: "microphone" as PermissionName });
+      const camera = await navigator.permissions.query({ name: "camera" as PermissionName });
+
+      if (microphone.state === "denied" || camera.state === "denied") {
+        console.error("마이크 또는 카메라 권한이 거부되어 있습니다.");
+        return false;
+      }
+
+      return true;
+    } catch {
+      // Permissions API 미지원 시 fallback
+      return true;
+    }
+  };
 
   const initStream = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
@@ -37,26 +57,30 @@ export function useRecorder() {
     }
 
     draw();
-
-    return () => {
-      if (frameIdRef.current !== null) {
-        cancelAnimationFrame(frameIdRef.current);
-        frameIdRef.current = null;
-      }
-    };
   };
 
   // 녹화 시작
   const startRecording = async () => {
+    // 이미 녹화 중이면 아무 작업도 하지 않음
+    if (isRecording) return;
+
+    // 권한 확인
+    const permissionGranted = await hasMediaPermission();
+    if (!permissionGranted) return;
+
+    // 스트림 초기화
+    await initStream();
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    // MediaRecorder의 MIME 타입 설정
-    const isWebmSupported = MediaRecorder.isTypeSupported("video/webm");
 
     try {
       const videoStream = canvas.captureStream();
       const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!videoStream || !audioStream) {
+        console.error("비디오 또는 오디오 스트림을 가져올 수 없습니다.");
+        return;
+      }
 
       // 비디오와 오디오 스트림을 결합
       const combinedStream = new MediaStream([
@@ -64,7 +88,9 @@ export function useRecorder() {
         ...audioStream.getAudioTracks()
       ]);
       
-      const mediaRecorder = new MediaRecorder(combinedStream, isWebmSupported ? { mimeType: "video/webm" } : undefined);
+      // 미디어 레코더 생성
+      const mediaRecorderMimeType = MediaRecorder.isTypeSupported("video/webm") ? { mimeType: "video/webm" } : undefined;
+      const mediaRecorder = new MediaRecorder(combinedStream, mediaRecorderMimeType);
 
       const chunks: Blob[] = [];
 
@@ -73,7 +99,9 @@ export function useRecorder() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, isWebmSupported ? { type: "video/webm" } : undefined);
+        // Blob 생성 및 URL 생성
+        const blobType = MediaRecorder.isTypeSupported("video/webm") ? { type: "video/webm" } : undefined;
+        const blob = new Blob(chunks, blobType);
         const url = URL.createObjectURL(blob);
 
         // 이전 녹화 URL이 있다면 해제
@@ -97,6 +125,9 @@ export function useRecorder() {
   };
 
   const stopRecording = () => {
+    // 녹화 중이 아닐 때는 아무 작업도 하지 않음
+    if (!isRecording) return;
+
     const mediaRecorder = mediaRecorderRef.current;
     if (!mediaRecorder) return;
 
