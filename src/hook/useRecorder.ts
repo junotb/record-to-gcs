@@ -6,10 +6,10 @@ export function useRecorder() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const frameIdRef = useRef<number | null>(null);
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // 마이크와 카메라 권한 확인
   const hasMediaPermission = async (): Promise<boolean> => {
@@ -18,7 +18,7 @@ export function useRecorder() {
       const camera = await navigator.permissions.query({ name: "camera" as PermissionName });
 
       if (microphone.state === "denied" || camera.state === "denied") {
-        console.error("마이크 또는 카메라 권한이 거부되어 있습니다.");
+        setError("마이크 또는 카메라 권한이 거부되어 있습니다.");
         return false;
       }
 
@@ -30,33 +30,38 @@ export function useRecorder() {
   };
 
   const initStream = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
 
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
 
-    if (!video || !canvas) return;
+      if (!video || !canvas) return;
 
-    video.srcObject = stream;
-    await video.play();
+      video.srcObject = stream;
+      await video.play();
 
-    const { videoWidth, videoHeight } = video;
+      const { videoWidth, videoHeight } = video;
 
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
 
-    canvas.style.width = "100%";
-    canvas.style.height = `${videoHeight / videoWidth * 100}%`;
+      canvas.style.width = "100%";
+      canvas.style.height = `${videoHeight / videoWidth * 100}%`;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-    const draw = () => {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      frameIdRef.current = requestAnimationFrame(draw);
+      const draw = () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    } catch (error) {
+      console.error(error);
+      setError("카메라 또는 마이크에 접근할 수 없습니다. 권한을 확인해주세요.");
     }
-
-    draw();
   };
 
   // 녹화 시작
@@ -78,7 +83,7 @@ export function useRecorder() {
       const videoStream = canvas.captureStream();
       const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       if (!videoStream || !audioStream) {
-        console.error("비디오 또는 오디오 스트림을 가져올 수 없습니다.");
+        setError("비디오 또는 오디오 스트림을 가져올 수 없습니다.");
         return;
       }
 
@@ -120,7 +125,8 @@ export function useRecorder() {
       mediaRecorderRef.current = mediaRecorder;
       setIsRecording(true);
     } catch (error) {
-      console.error("오디오 장치에 접근할 수 없습니다. 오디오 권한을 확인해주세요: ", error);
+      console.error(error);
+      setError("오디오 장치에 접근할 수 없습니다. 오디오 권한을 확인해주세요: ");
     }
   };
 
@@ -140,6 +146,7 @@ export function useRecorder() {
     canvasRef,
     isRecording,
     recordedUrl,
+    error,
     initStream,
     startRecording,
     stopRecording,
