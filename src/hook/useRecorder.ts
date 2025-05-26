@@ -6,11 +6,16 @@ export function useRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const frameIdRef = useRef<number | null>(null);
 
+  const [isInitialized, setIsInitialized] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
 
   const initStream = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    if (!stream) {
+      console.error("비디오/오디오 스트림을 가져올 수 없습니다.");
+      return;
+    }
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -38,6 +43,8 @@ export function useRecorder() {
 
     draw();
 
+    setIsInitialized(true);
+
     return () => {
       if (frameIdRef.current !== null) {
         cancelAnimationFrame(frameIdRef.current);
@@ -57,6 +64,10 @@ export function useRecorder() {
     try {
       const videoStream = canvas.captureStream();
       const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!videoStream || !audioStream) {
+        console.error("비디오 또는 오디오 스트림을 가져올 수 없습니다.");
+        return;
+      }
 
       // 비디오와 오디오 스트림을 결합
       const combinedStream = new MediaStream([
@@ -107,6 +118,7 @@ export function useRecorder() {
   return {
     videoRef,
     canvasRef,
+    isInitialized,
     isRecording,
     recordedUrl,
     initStream,

@@ -7,7 +7,7 @@ import { Playback } from "@/component/card/Playback";
 import { useRecorder } from "@/hook/useRecorder";
 
 export default function Home() {
-  const { videoRef, canvasRef, isRecording, recordedUrl, initStream, startRecording, stopRecording } = useRecorder();
+  const { videoRef, canvasRef, isInitialized, isRecording, recordedUrl, initStream, startRecording, stopRecording } = useRecorder();
 
   useEffect(() => {
     initStream();
@@ -23,6 +23,7 @@ export default function Home() {
             <Recorder
               videoRef={videoRef}
               canvasRef={canvasRef}
+              isInitialized={isInitialized}
               isRecording={isRecording}
               startRecording={startRecording}
               stopRecording={stopRecording} />
