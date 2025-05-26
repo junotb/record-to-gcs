@@ -11,6 +11,9 @@ export function useRecorder() {
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Safari 감지
+  const isSafari = (): boolean => /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
   // 마이크와 카메라 권한 확인
   const hasMediaPermission = async (): Promise<boolean> => {
     try {
@@ -30,6 +33,11 @@ export function useRecorder() {
   };
 
   const initStream = async () => {
+    if (isSafari()) {
+      setError("Safari에서는 녹화 기능이 지원되지 않습니다. 다른 브라우저를 사용해주세요.");
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
 
@@ -94,8 +102,7 @@ export function useRecorder() {
       ]);
       
       // 미디어 레코더 생성
-      const mediaRecorderMimeType = MediaRecorder.isTypeSupported("video/webm") ? { mimeType: "video/webm" } : undefined;
-      const mediaRecorder = new MediaRecorder(combinedStream, mediaRecorderMimeType);
+      const mediaRecorder = new MediaRecorder(combinedStream, { mimeType: "video/webm" });
 
       const chunks: Blob[] = [];
 
@@ -105,8 +112,7 @@ export function useRecorder() {
 
       mediaRecorder.onstop = () => {
         // Blob 생성 및 URL 생성
-        const blobType = MediaRecorder.isTypeSupported("video/webm") ? { type: "video/webm" } : undefined;
-        const blob = new Blob(chunks, blobType);
+        const blob = new Blob(chunks, { type: "video/webm" });
         const url = URL.createObjectURL(blob);
 
         // 이전 녹화 URL이 있다면 해제
