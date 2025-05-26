@@ -10,8 +10,14 @@ export function useRecorder() {
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Safari 감지
-  const isSafari = (): boolean => /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  // MediaRecorder가 지원되는지 확인하는 함수
+  const checkMediaRecorderSupported = (): boolean => {
+    if (typeof MediaRecorder === "undefined" || !MediaRecorder.isTypeSupported("video/webm")) {
+      setError("이 브라우저는 MediaRecorder API를 지원하지 않습니다. Chrome, Firefox, Edge 등 다른 브라우저를 사용해주세요.");
+      return false;
+    }
+    return true;
+  };
 
   // 마이크와 카메라 권한 확인
   const hasMediaPermission = async (): Promise<boolean> => {
@@ -38,11 +44,9 @@ export function useRecorder() {
       return;
     };
 
-    // 사파리 브라우저에서는 녹화 기능이 지원되지 않음
-    if (isSafari()) {
-      setError("Safari에서는 녹화 기능이 지원되지 않습니다. 다른 브라우저를 사용해주세요.");
-      return;
-    }
+    // MediaRecorder 지원 여부 확인
+    const isMediaRecorderSupported = checkMediaRecorderSupported();
+    if (!isMediaRecorderSupported) return;
 
     // 미디어 권한 확인
     const permissionGranted = await hasMediaPermission();
