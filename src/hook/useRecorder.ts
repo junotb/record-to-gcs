@@ -7,8 +7,8 @@ export function useRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const [isRecording, setIsRecording] = useState(false);
-  const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [recordedUrl, setRecordedUrl] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   // MediaRecorder가 지원되는지 확인하는 함수
   const checkMediaRecorderSupported = (): boolean => {

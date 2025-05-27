@@ -1,4 +1,6 @@
 import { RefObject } from "react";
+import Image from "next/image";
+import clsx from "clsx";
 
 interface RecorderProps {
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -10,15 +12,23 @@ interface RecorderProps {
 export function Recorder({ videoRef, isRecording, startRecording, stopRecording }: RecorderProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-center items-center w-80 min-h-[20rem] sm:w-96 sm:min-h-[24rem] rounded-xl shadow-xl">
-        <div className="inline-block w-full">
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            className="w-full aspect-auto rounded-xl"
+      <div className="flex justify-center items-center w-80 min-h-80 sm:w-96 sm:min-h-96 rounded-xl shadow-xl">
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          className={clsx("w-full aspect-auto rounded-xl", {
+            "hidden": !isRecording,
+          })}
+        />
+        {!isRecording && (
+          <Image
+            src="/video-camera-slash.svg"
+            alt="No recorder"
+            width={60}
+            height={60}
           />
-        </div>
+        )}
       </div>
 
       <div className="w-full h-12">
