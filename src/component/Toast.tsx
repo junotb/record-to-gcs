@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 
 type ToastProps = {
-  error?: string | null;
+  error?: string | undefined;
   duration?: number; // 기본값: 3000ms
 };
 
