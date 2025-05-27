@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface PlaybackProps {
-  recordedUrl: string | undefined;
+  recordedUrl?: string;
 }
 
 export function Playback({ recordedUrl }: PlaybackProps) {
@@ -31,7 +31,7 @@ export function Playback({ recordedUrl }: PlaybackProps) {
 
       {recordedUrl && (
         <Link
-          href={recordedUrl ? recordedUrl : "#"}
+          href={recordedUrl}
           target="_blank"
           rel="noopener noreferrer"
           download="recording.webm"
