@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useRecorder() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
+  const chunksRef = useRef<Blob[]>([]);
+  
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,15 +70,15 @@ export function useRecorder() {
       // 미디어 레코더 생성
       const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
 
-      const chunks: Blob[] = [];
-
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunks.push(event.data);
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
       };
 
       mediaRecorder.onstop = () => {
         // Blob 생성 및 URL 생성
-        const blob = new Blob(chunks, { type: "video/webm" });
+        const blob = new Blob(chunksRef.current, { type: "video/webm" });
         const url = URL.createObjectURL(blob);
 
         // 이전 녹화 URL이 있다면 해제
@@ -110,6 +111,21 @@ export function useRecorder() {
     mediaRecorder.stop();
     setIsRecording(false);
   };
+
+  useEffect(() => {
+    // 강제 종료 방지
+    const handleBeforeUnload = () => {
+      const mediaRecorder = mediaRecorderRef.current;
+      if (!mediaRecorder) return;
+
+      if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop(); // 강제 종료 방지
+      }
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);  
 
   return {
     videoRef,
