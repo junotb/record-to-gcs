@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 
 type ToastProps = {
-  error?: string;
+  error: string | null;
 };
 
 export const Toast = ({ error }: ToastProps) => {
