@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 interface PlaybackProps {
   recordedUrl: string | null;
@@ -38,15 +37,15 @@ export function Playback({ recordedUrl }: PlaybackProps) {
       </div>
 
       <div className="w-full h-12">
-        <Link
+        <a
           href={recordedUrl}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow"
           download="recording.webm"
           className="inline-block border px-4 py-2 w-full bg-black text-center text-white rounded-xl shadow-xl"
         >
           파일 받기
-        </Link>
+        </a>
       </div>
     </div>
   );
