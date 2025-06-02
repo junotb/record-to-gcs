@@ -8,8 +8,8 @@ export function useRecorder() {
   const chunksRef = useRef<Blob[]>([]);
   
   const [isRecording, setIsRecording] = useState(false);
-  const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [recordedUrl, setRecordedUrl] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   /**
    * @returns boolean

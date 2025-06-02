@@ -1,7 +1,8 @@
+import clsx from "clsx";
 import Image from "next/image";
 
 interface PlaybackProps {
-  recordedUrl: string | null;
+  recordedUrl?: string;
 }
 
 export function Playback({ recordedUrl }: PlaybackProps) {
@@ -11,7 +12,7 @@ export function Playback({ recordedUrl }: PlaybackProps) {
         <div className="flex justify-center items-center w-80 min-h-80 sm:w-96 sm:min-h-96 rounded-xl shadow-xl">
           <Image
             src="/video-camera-slash.svg"
-            alt="No recording"
+            alt="No playback"
             width={60}
             height={60}
           />

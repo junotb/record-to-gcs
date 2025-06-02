@@ -2,20 +2,19 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 
 type ToastProps = {
-  error?: string | null;
-  duration?: number; // 기본값: 3000ms
+  error?: string;
 };
 
-export const Toast = ({ error, duration = 3000 }: ToastProps) => {
+export const Toast = ({ error }: ToastProps) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (error) {
       setVisible(true);
-      const timer = setTimeout(() => setVisible(false), duration);
+      const timer = setTimeout(() => setVisible(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, [error, duration]);
+  }, [error]);
 
   return (
     <div
