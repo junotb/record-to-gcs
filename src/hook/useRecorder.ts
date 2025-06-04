@@ -170,8 +170,8 @@ export function useRecorder() {
       video.onloadedmetadata = () => {
         cleanup();
         const duration = video.duration;
-        const isValid = duration > 0 && duration !== Infinity;
-        // duration이 0보다 크고 Infinity가 아니면 유효한 비디오로 간주
+        const isValid = duration > 0;
+        // duration이 0보다 크면 유효한 비디오로 간주
         resolve({
           isValid,
           errorMessage: isValid ? undefined : "비디오 파일의 길이에 문제가 있습니다."
